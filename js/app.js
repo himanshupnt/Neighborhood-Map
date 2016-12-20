@@ -69,7 +69,7 @@ function MapViewModel (){
 
         /*--Populate info window with marker information--*/
         self.populateInfoWindow = function(marker, infoWindow) {
-          // Check to make sure the infowindow is not already opened on this marker.
+          /* Check to make sure the infowindow is not already opened on this marker.*/
           if (infoWindow.marker != marker) {
               infoWindow.marker = marker;
               if (markerAnim) {
@@ -77,7 +77,7 @@ function MapViewModel (){
                         markerAnim.setAnimation(null);
                     }        
               }
-              //Add bounce Animation
+              /*Add bounce Animation*/
               marker.setAnimation(google.maps.Animation.BOUNCE);
               markerAnim = marker;
               
@@ -115,7 +115,7 @@ function MapViewModel (){
                   
               }
 
-              // Make sure the marker property is cleared if the infowindow is closed.
+              /* Make sure the marker property is cleared if the infowindow is closed.*/
               infoWindow.addListener('closeclick', function() {
                   infoWindow.marker = null;
                   marker.setAnimation(null);
