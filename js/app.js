@@ -165,6 +165,7 @@ function MapViewModel (){
             if(self.trails()[i].title.search(searchQuery) !== -1) {
                 matchedTrails.push(self.trails()[i]);
                 self.trails()[i].trailMarker.setVisible(true);
+                self.trails()[i].panToLoc();
             } else {
                 self.trails()[i].trailMarker.setVisible(false);
                 infoWindow.close();
