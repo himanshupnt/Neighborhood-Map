@@ -59,7 +59,7 @@ function MapViewModel (){
         self.panToLoc = function (){
             map.panTo({lat: self.latitude, lng: self.longitude});
         };
-        
+                
         /*Click handler for a trail marker*/
         self.trailMarker.addListener('click', function() {
             self.panToLoc();
@@ -82,7 +82,7 @@ function MapViewModel (){
               markerAnim = marker;
               
               /*Build initial content for this trail marker*/
-              var contentString = '<h2 class="trail-title">' + self.title + '</h2>' + '<p class="trail-distance">Distance: ' + self.distance +'</p><div id="foursquarePhotos"></div>';
+              var contentString = '<h2 class="trail-title">' + self.title + '</h2>' + '<p class="trail-distance">Distance: ' + self.distance +'</p>';
               
               /*Set content to initial content*/
               infoWindow.setContent(contentString);
@@ -92,23 +92,33 @@ function MapViewModel (){
               
               /*First check to see if there exists any FourSquare content for this trail marker*/
               if (!self.fourSquareContent) {
-                  $("#foursquarePhotos").html('<h3>Loading photos...</h3>');
-                  
+                  var initialContent = infoWindow.getContent();
+                  var loadingMsg =  initialContent + '<div id="foursquarePhotos"><h3>Loading photos...</h3></div>';
+                  infoWindow.setContent(loadingMsg);
                   $.ajax({
                       url: fourSquareURL,
                       dataType: 'json',
                       success: function (data) {
-                          $("#foursquarePhotos").html('');
+                          /*Remove loading message for FourSquare content*/
+                          infoWindow.setContent(initialContent);
+                          /*Build content for FourSquare content*/
+                          var content = initialContent + '<div id="foursquarePhotos">';
+                          content += '<p>FourSquare Photos</p>';
+                          /*FourSquare photos for respective trail*/
                           var photos = data.response.venue.photos.groups[0].items;
+                          /*Get FourSquare page URL for respective trail*/
                           var fourSquareURL = data.response.venue.canonicalUrl;
                           /*Loop through trailPhotos array and get first 4 photos, and link each photo to respective FS URL*/
                           for (var i =0; i < 4; i++){
-                                $("#foursquarePhotos").append('<div class="fsphoto"><a target="_blank" href="'+fourSquareURL+'"><img src="' + photos[i].prefix + '40x40' +photos[i].suffix + '"></a></div>');
+                                content += '<div class="fsphoto"><a target="_blank" href="'+fourSquareURL+'"><img src="' + photos[i].prefix + '40x40' +photos[i].suffix + '"></a></div>';
                           }
+                          content += '</div>'
+                          infoWindow.setContent(content);
                       },
                       /*Error handler*/
                       error: function () {
-                          $("#foursquarePhotos").html('<h3>Error loading FourSquare data : Failed!</h3>');
+                          var errorMessage = '<h3>Error loading FourSquare data : Failed!</h3>';
+                          infoWindow.setContent(errorMessage);
                       }
                       
                   });
@@ -154,6 +164,10 @@ function MapViewModel (){
         self.trails(trailListings);
         /*Set the viewport to contain the given bounds(all trail markers).*/
         map.fitBounds(bounds);
+        /*Add responsiveness - Resize map whenever window is resized*/
+        google.maps.event.addDomListener(window, 'resize', function() {
+            map.fitBounds(bounds);
+        }); 
     }
     /*Filter through the trails listing and return matched search query*/
     self.searchResults = ko.computed(function () {
@@ -204,6 +218,7 @@ function initMap() {
     center: sanDiego,
     mapTypeControl: false
   });
+
   /*Apply knockout bindings*/  
   ko.applyBindings(new MapViewModel());
 }
