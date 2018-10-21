@@ -1,7 +1,7 @@
 'use strict';
 
 var map;
-
+let apples;
 /*----Map ViewModel----*/
 function MapViewModel (){
     /*Declare global infoWindow object to close an inactive infowindow automatically -
